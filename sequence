@@ -1,0 +1,173 @@
+#include "protein.h"
+#include "DNA.h"
+#include "sequence.h"
+#include "CodonsTable.h"
+
+
+Protein::Protein(): sequence()
+{
+    seq = new char [0];
+    type = Hormon ;
+
+}
+
+Protein::Protein(char* p){
+    int length = 0;
+    for(int i = 0; i < strlen(p); i++){
+        length += 1;
+    }
+    p = new char [length+1];
+    this -> seq = p;
+}
+
+Protein::~Protein()
+{
+    delete[] seq;
+}
+
+void Protein::settype(Protein_Type h){
+
+    this->type = h;
+}
+
+int Protein::gettype(){
+
+    return type;
+}
+
+DNA* GetDNAStrandsEncodingMe(const DNA & bigDNA)
+
+{
+
+	vector <char*> v;
+	char * anew;
+	int ind = 0;
+	Codonstable c;
+	for (int i = 0; i < strlen(bigDNA) ; i++)
+	{
+		anew = new char[3 * length];
+		for (int j = i; j < i+3*length; j++)
+		{
+			anew[ind] = bigDNA.seq[j];
+			ind++;
+		}
+		anew[ind] = '\0' ;
+		ind = 0;
+
+		DNA D (anew, promoter, 3*length);
+		Protein pro;
+		pro = pro.convert_to_RNA().convert_to_Protien(c);
+
+		if (strcmp(pro.seq,seq) == 0)
+		{
+			v.push_back(anew);
+		}
+
+	}
+	DNA* X = new DNA[v.size()];
+	for (int i = 0; i < v.size(); i++)
+	{
+		DNA* Y = new DNA(v[i], promoter, length * 3);
+		X[i] = *Y;
+	}
+	return X;
+}
+
+
+
+
+
+
+void Protein::Print(){
+
+    cout << "seq: " << getseq() << endl;
+    cout << "type: " << endl;
+    switch(type){
+
+        case(0):
+            cout << "Hormon" << endl;
+            break;
+        case(1):
+            cout << "Enzyme" << endl;
+            break;
+        case(2):
+            cout << "TF" << endl;
+            break;
+        case(3):
+            cout << "Cellular_Function" << endl;
+            break;
+    }
+
+ }
+
+
+
+void Protein :: input_implementation( string type , string  strand , sequence * object )
+{
+
+
+    if      ( type == "Hormon" ) ((Protein*)object)->type = Hormon;
+    else if ( type == "Enzyme" ) ((Protein*)object)->type = Enzyme;
+    else if ( type == "TF" ) ((Protein*)object)->type = TF;
+    else if ( type == "Cellular_Function" ) ((Protein*)object)->type = Cellular_Function;
+    else
+    {
+        cout << "Invalid Protein type";
+        return;
+    }
+
+    char * a = new char[ strand.length() +1 ];
+    for ( int i = 0; i < strand.length(); i++ )
+        a[i] = strand[i];
+    a[ strand.length() ] = '\0';
+
+
+    ((Protein*)object)->setseq( a );
+}
+
+char* Protein::operator + (Protein * Seq)
+{
+    Seq->seq = new char;
+    int len = this->getlength() + Seq->getlength();
+    char* Merge = new char[len];
+    for(int i = 0; i < this->getlength(); i++)
+    {
+        Merge[i]= this->seq[i];
+    }
+    for(int i = this->getlength(); i < len; i++)
+    {
+        int j = 0;
+        Merge[i]= Seq->getseq()[j];
+        j++;
+    }
+    return Merge;
+}
+
+ostream& operator << (ostream& out ,Protein* seq){
+
+        for ( int i = 0; i < strlen(seq->seq); i++){
+
+            out << seq->seq[i] << " ";
+        }
+        return out;
+}
+
+bool Protein :: operator!=(Protein *s1)
+{
+    s1->seq = new char;
+    for(int i=0; i<strlen(seq); i++)
+    {
+        if(seq != s1->seq) {return true;}
+        else{return false;}
+    }
+}
+
+bool Protein :: operator==(Protein *s1)
+{
+    s1->seq = new char;
+    for(int i=0; i<strlen(seq) ; i++)
+    {
+        if(seq==s1->seq){return true;}
+        else{return false;}
+    }
+}
